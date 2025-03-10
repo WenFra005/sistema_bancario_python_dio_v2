@@ -1,4 +1,6 @@
 import textwrap
+from datetime import date
+
 
 class Banco:
     def __init__(self):
@@ -7,6 +9,7 @@ class Banco:
         self.numero_conta = 0
         self.saldo = 0
         self.extrato = {"depositos": [], "saques": []}
+        self.saques_diarios = {"data:": date.today(), "contador": 0}
 
     def validar_usuario_cpf(self, cpf):
         next((usuario for usuario in self.usuarios if usuario.cpf == cpf), None)
@@ -57,6 +60,12 @@ class Banco:
             print("Depósito efetuado com sucesso\n")
 
     def sacar(self):
+        if self.saques_diarios["data"] != date.today():
+            self.saques_diarios = {"data": date.today(), "contador": 0}
+
+        if self.saques_diarios["contador"] >= 3:
+            print("Limite de saques diários atingido\n")
+            return
 
         valor_saque = int(input("Qual é o valor do saque?: "))
         if valor_saque <= self.saldo:
