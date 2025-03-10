@@ -1,3 +1,14 @@
+def exibir_menu():
+    menu = """
+    1. Depositar
+    2. Sacar
+    3. Exibir extrato
+    4. Criar usuário
+    5. Criar conta
+    6. Sair
+    """
+    return menu
+
 def depositar(saldo, extrato):
 
     valor_deposito = int(input("Qual é o valor do depósito?: "))
