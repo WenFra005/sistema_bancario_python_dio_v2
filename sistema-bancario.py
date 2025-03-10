@@ -10,7 +10,7 @@ def exibir_menu():
     5. Criar conta
     6. Sair
     """
-    return menu
+    return input(textwrap.dedent(menu))
 
 def depositar(saldo, extrato):
 
