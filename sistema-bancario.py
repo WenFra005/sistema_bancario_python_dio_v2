@@ -7,16 +7,14 @@ class Banco:
         self.usuarios = []
         self.contas = []
         self.numero_conta = 0
-        self.saldo = 0
-        self.extrato = {"depositos": [], "saques": []}
         self.saques_diarios = {"data:": date.today(), "contador": 0}
 
-    def validar_usuario_cpf(self, cpf):
-        next((usuario for usuario in self.usuarios if usuario.cpf == cpf), None)
+    def validar_usuario_conta_cpf(self, cpf):
+        return next((usuario for usuario in self.usuarios if usuario.cpf == cpf), None)
 
     def criar_usuario(self):
         cpf = input("Digite o CPF do usuário: ")
-        usuario = self.validar_usuario_cpf(cpf)
+        usuario = self.validar_usuario_conta_cpf(cpf)
 
         if usuario:
             print("Usuário já cadastrado")
@@ -35,6 +33,30 @@ class Banco:
             "endereco": endereco
         })
         print("Usuário cadastrado com sucesso")
+
+    def criar_conta(self):
+        cpf = input("Digite o CPF do usuário: ")
+        usuario = self.validar_usuario_conta_cpf(cpf)
+
+        if not usuario:
+            print("Usuário não cadastrado")
+            return
+
+        conta = {
+            "agencia": "0001",
+            "numero_conta": self.numero_conta,
+            "usuario": usuario,
+            "saldo": 0,
+            "extrato": {"depositos": [], "saques": []}
+
+        }
+
+        self.contas.append(conta)
+        self.numero_conta += 1
+        print("Conta criada com sucesso!")
+        print("Dados da conta".center(25, "="))
+        print(f"Agência: {conta['agencia']}")
+        print(f"Número da conta: {conta['numero_conta']}\n")
 
     def exibir_menu(self):
         menu = """
@@ -55,8 +77,8 @@ class Banco:
         if valor_deposito < 0:
             print("Valor inválido\n")
         else:
-            self.saldo +=valor_deposito
-            self.extrato["depositos"].append(valor_deposito)
+            self.contas["saldo"] +=valor_deposito
+            self.contas["extrato"]["depositos"].append(valor_deposito)
             print("Depósito efetuado com sucesso\n")
 
     def sacar(self):
@@ -68,9 +90,9 @@ class Banco:
             return
 
         valor_saque = int(input("Qual é o valor do saque?: "))
-        if valor_saque <= self.saldo:
-            self.saldo -= valor_saque
-            self.extrato["saques"].append(valor_saque)
+        if valor_saque <= self.contas["saldo"]:
+            self.contas["saldo"] -= valor_saque
+            self.contas["extrato"]["saques"].append(valor_saque)
         else:
             print("Saldo insuficiente\n")
 
@@ -91,14 +113,18 @@ class Banco:
 
         while True:
 
-            opcao = exibir_menu()
+            opcao = self.exibir_menu()
             if opcao == "1":
-                saldo = depositar(saldo, extrato)
+                self.depositar()
             elif opcao == "2":
-                saldo = sacar(saldo, extrato)
+                self.sacar()
             elif opcao == "3":
-                exibir_extrato(saldo, extrato)
+                self.sacar()
             elif opcao == "4":
+                self.criar_usuario()
+            elif opcao == "5":
+                self.criar_conta()
+            elif opcao == "6":
                 break
             else:
                 print("Opção inválida")
