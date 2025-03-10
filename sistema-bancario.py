@@ -9,7 +9,8 @@ def exibir_menu():
     4. Criar usuário
     5. Criar conta
     6. Sair
-    """
+    
+    Escolha uma opção: """
     return input(textwrap.dedent(menu))
 
 def depositar(saldo, extrato):
@@ -38,21 +39,21 @@ def exibir_titulos_extrato():
     t_extrato = "Extrato"
     t_depositos = "Depósito"
     t_saques = "Saques"
-    t_separador = "-"
+    t_Saldo = "Saldo"
 
-    return t_extrato, t_depositos, t_saques, t_separador
+    return t_extrato, t_depositos, t_saques, t_Saldo
 
 def exibir_extrato(saldo, extrato):
 
-    print(exibir_titulos_extrato()[0].center(15, "="))
-    print(exibir_titulos_extrato()[1].center(15, "="))
+    print(exibir_titulos_extrato()[0].center(25, "="))
+    print(exibir_titulos_extrato()[1].center(25, "="))
     for i, valor in enumerate(extrato["depositos"]):
         print(f"{i + 1}. R$ {valor:.2f}")
-    print(exibir_titulos_extrato()[2].center(15, "="))
+    print(exibir_titulos_extrato()[2].center(25, "="))
     for i, valor in enumerate(extrato["saques"]):
         print(f"{i + 1}. R$ {valor:.2f}")
-    print(exibir_titulos_extrato()[3].center(15, "="))
-    print(f"Saldo: R$ {saldo:.2f}")
+    print(exibir_titulos_extrato()[3].center(25, "="))
+    print(f"R$ {saldo:.2f}")
     print("\n")
 
 
@@ -65,12 +66,7 @@ def main():
     }
     while True:
 
-        print("1 - Depositar")
-        print("2 - Sacar")
-        print("3 - Extrato")
-        print("4 - Sair")
-
-        opcao = input("Escolha uma opção: ")
+        opcao = exibir_menu()
         if opcao == "1":
             saldo = depositar(saldo, extrato)
         elif opcao == "2":
