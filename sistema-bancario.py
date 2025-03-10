@@ -1,16 +1,15 @@
 import textwrap
 from datetime import date
 
-
 class Banco:
     def __init__(self):
         self.usuarios = []
         self.contas = []
         self.numero_conta = 0
-        self.saques_diarios = {"data:": date.today(), "contador": 0}
+        self.saques_diarios = {"data": date.today(), "contador": 0}
 
     def validar_usuario_conta_cpf(self, cpf):
-        return next((usuario for usuario in self.usuarios if usuario.cpf == cpf), None)
+        return next((usuario for usuario in self.usuarios if usuario["cpf"] == cpf), None)
 
     def criar_usuario(self):
         cpf = input("Digite o CPF do usuário: ")
@@ -18,7 +17,7 @@ class Banco:
 
         if usuario:
             print("Usuário já cadastrado")
-        return
+            return
 
         nome = input("Digite o nome do usuário: ")
         data_nascimento = input("Digite a data de nascimento do usuário: ")
@@ -68,20 +67,33 @@ class Banco:
         6. Sair
         
         Escolha uma opção: """
-
         return input(textwrap.dedent(menu))
 
+    def obter_conta(self, numero_conta):
+        return next((conta for conta in self.contas if conta["numero_conta"] == numero_conta), None)
+
     def depositar(self):
+        numero_conta = int(input("Digite o número da conta: "))
+        conta = self.obter_conta(numero_conta)
+        if not conta:
+            print("Conta não encontrada\n")
+            return
 
         valor_deposito = int(input("Qual é o valor do depósito?: "))
         if valor_deposito < 0:
             print("Valor inválido\n")
         else:
-            self.contas["saldo"] +=valor_deposito
-            self.contas["extrato"]["depositos"].append(valor_deposito)
+            conta["saldo"] +=valor_deposito
+            conta["extrato"]["depositos"].append(valor_deposito)
             print("Depósito efetuado com sucesso\n")
 
     def sacar(self):
+        numero_conta = int(input("Digite o número da conta: "))
+        conta = self.obter_conta(numero_conta)
+        if not conta:
+            print("Conta não encontrada\n")
+            return
+
         if self.saques_diarios["data"] != date.today():
             self.saques_diarios = {"data": date.today(), "contador": 0}
 
@@ -90,23 +102,30 @@ class Banco:
             return
 
         valor_saque = int(input("Qual é o valor do saque?: "))
-        if valor_saque <= self.contas["saldo"]:
-            self.contas["saldo"] -= valor_saque
-            self.contas["extrato"]["saques"].append(valor_saque)
+        if valor_saque <= conta["saldo"]:
+            conta["saldo"] -= valor_saque
+            conta["extrato"]["saques"].append(valor_saque)
+            self.saques_diarios["contador"] += 1
+            print("Saque efetuado com sucesso\n")
         else:
             print("Saldo insuficiente\n")
 
     def exibir_extrato(self):
+        numero_conta = int(input("Digite o número da conta: "))
+        conta = self.obter_conta(numero_conta)
+        if not conta:
+            print("Conta não encontrada\n")
+            return
 
         print("Extrato".center(25, "="))
         print("Depósito".center(25, "="))
-        for i, valor in enumerate(self.extrato["depositos"]):
+        for i, valor in enumerate(conta["extrato"]["depositos"]):
             print(f"{i + 1}. R$ {valor:.2f}")
         print("Saques".center(25, "="))
-        for i, valor in enumerate(self.extrato["saques"]):
+        for i, valor in enumerate(conta["extrato"]["saques"]):
             print(f"{i + 1}. R$ {valor:.2f}")
         print("Saldo".center(25, "="))
-        print(f"R$ {self.saldo:.2f}")
+        print(f"R$ {conta["saldo"]:.2f}")
         print("\n")
 
     def main(self):
@@ -119,7 +138,7 @@ class Banco:
             elif opcao == "2":
                 self.sacar()
             elif opcao == "3":
-                self.sacar()
+                self.exibir_extrato()
             elif opcao == "4":
                 self.criar_usuario()
             elif opcao == "5":
@@ -129,4 +148,6 @@ class Banco:
             else:
                 print("Opção inválida")
 
-    main()
+if __name__ == "__main__":
+    banco = Banco()
+    banco.main()
