@@ -8,6 +8,31 @@ class Banco:
         self.saldo = 0
         self.extrato = {"depositos": [], "saques": []}
 
+    def validar_usuario_cpf(self, cpf):
+        next((usuario for usuario in self.usuarios if usuario.cpf == cpf), None)
+
+    def criar_usuario(self):
+        cpf = input("Digite o CPF do usuário: ")
+        usuario = self.validar_usuario_cpf(cpf)
+
+        if usuario:
+            print("Usuário já cadastrado")
+        return
+
+        nome = input("Digite o nome do usuário: ")
+        data_nascimento = input("Digite a data de nascimento do usuário: ")
+        email = input("Digite o email do usuário: ")
+        endereco = input("Digite o endereço do usuário (Logradouro, nº - Bairro - Cidade/Sigla do Estado): ")
+
+        self.usuarios.append({
+            "cpf": cpf,
+            "nome": nome,
+            "data_nascimento": data_nascimento,
+            "email": email,
+            "endereco": endereco
+        })
+        print("Usuário cadastrado com sucesso")
+
     def exibir_menu(self):
         menu = """
         1. Depositar
