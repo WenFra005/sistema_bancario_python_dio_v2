@@ -46,50 +46,39 @@ class Banco:
 
         return input(textwrap.dedent(menu))
 
-    def depositar(saldo, extrato):
+    def depositar(self):
 
         valor_deposito = int(input("Qual é o valor do depósito?: "))
         if valor_deposito < 0:
             print("Valor inválido\n")
-            return saldo
         else:
-            saldo = saldo + valor_deposito
-            extrato["depositos"].append(valor_deposito)
+            self.saldo +=valor_deposito
+            self.extrato["depositos"].append(valor_deposito)
             print("Depósito efetuado com sucesso\n")
-            return saldo
 
-    def sacar(saldo, extrato):
+    def sacar(self):
 
         valor_saque = int(input("Qual é o valor do saque?: "))
-        if valor_saque <= saldo:
-            saldo = saldo - valor_saque
-            extrato["saques"].append(valor_saque)
+        if valor_saque <= self.saldo:
+            self.saldo -= valor_saque
+            self.extrato["saques"].append(valor_saque)
         else:
             print("Saldo insuficiente\n")
-        return saldo
 
-    def exibir_titulos_extrato():
-        t_extrato = "Extrato"
-        t_depositos = "Depósito"
-        t_saques = "Saques"
-        t_Saldo = "Saldo"
+    def exibir_extrato(self):
 
-        return t_extrato, t_depositos, t_saques, t_Saldo
-
-    def exibir_extrato(saldo, extrato):
-
-        print(exibir_titulos_extrato()[0].center(25, "="))
-        print(exibir_titulos_extrato()[1].center(25, "="))
-        for i, valor in enumerate(extrato["depositos"]):
+        print("Extrato".center(25, "="))
+        print("Depósito".center(25, "="))
+        for i, valor in enumerate(self.extrato["depositos"]):
             print(f"{i + 1}. R$ {valor:.2f}")
-        print(exibir_titulos_extrato()[2].center(25, "="))
-        for i, valor in enumerate(extrato["saques"]):
+        print("Saques".center(25, "="))
+        for i, valor in enumerate(self.extrato["saques"]):
             print(f"{i + 1}. R$ {valor:.2f}")
-        print(exibir_titulos_extrato()[3].center(25, "="))
-        print(f"R$ {saldo:.2f}")
+        print("Saldo".center(25, "="))
+        print(f"R$ {self.saldo:.2f}")
         print("\n")
 
-    def main():
+    def main(self):
 
         while True:
 
