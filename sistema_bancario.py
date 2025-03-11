@@ -1,17 +1,33 @@
+""""Programa que simula um sistema bancário com funcionalidades de criação de usuários e contas,
+depósitos, saques e exibição de extratos."""
+
 import textwrap
 from datetime import date
 
 class Banco:
+    """Classe que representa um banco com funcionalidades de criação de usuários e contas,
+    depósitos, saques e exibição de extratos."""
+
     def __init__(self):
+        """Inicializa a classe Banco com listas de usuários, contas e um contador de
+        número de conta."""
         self.usuarios = []
         self.contas = []
         self.numero_conta = 0
-        self.saques_diarios = {"data": date.today(), "contador": 0}
 
     def validar_usuario_conta_cpf(self, cpf):
+        """Valida se um usuário com o CPF fornecido já está cadastrado.
+
+        Args:
+            cpf (str): CPF do usuário.
+
+        Returns:
+            dict: usuário correspondente ao CPF, se encontrado. Caso contrário, None.
+        """
         return next((usuario for usuario in self.usuarios if usuario["cpf"] == cpf), None)
 
     def criar_usuario(self):
+        """Cria um usuário com os dados fornecidos pelo input."""
         cpf = input("Digite o CPF do usuário: ")
         usuario = self.validar_usuario_conta_cpf(cpf)
 
@@ -22,7 +38,9 @@ class Banco:
         nome = input("Digite o nome do usuário: ")
         data_nascimento = input("Digite a data de nascimento do usuário: ")
         email = input("Digite o email do usuário: ")
-        endereco = input("Digite o endereço do usuário (Logradouro, nº - Bairro - Cidade/Sigla do Estado): ")
+        endereco = input(
+            "Digite o endereço do usuário (Logradouro, nº - Bairro - Cidade/Sigla do Estado): "
+        )
 
         self.usuarios.append({
             "cpf": cpf,
@@ -34,6 +52,7 @@ class Banco:
         print("Usuário cadastrado com sucesso")
 
     def criar_conta(self):
+        """Cria uma nova conta para um usuário existente com o CPF fornecido pelo input."""
         cpf = input("Digite o CPF do usuário: ")
         usuario = self.validar_usuario_conta_cpf(cpf)
 
@@ -41,23 +60,29 @@ class Banco:
             print("Usuário não cadastrado")
             return
 
+        self.numero_conta += 1
         conta = {
             "agencia": "0001",
             "numero_conta": self.numero_conta,
             "usuario": usuario,
             "saldo": 0,
-            "extrato": {"depositos": [], "saques": []}
-
+            "extrato": {"depositos": [], "saques": []},
+            "saques_diarios": {"data": date.today(), "contador": 0}
         }
 
         self.contas.append(conta)
-        self.numero_conta += 1
         print("Conta criada com sucesso!")
         print("Dados da conta".center(25, "="))
         print(f"Agência: {conta['agencia']}")
         print(f"Número da conta: {conta['numero_conta']}\n")
 
-    def exibir_menu(self):
+    @staticmethod
+    def exibir_menu():
+        """Exibe o menu de opções e retorna a escolha do usuário.
+
+        Returns:
+            str: opção escolhida pelo usuário.
+        """
         menu = """
         1. Depositar
         2. Sacar
@@ -70,9 +95,18 @@ class Banco:
         return input(textwrap.dedent(menu))
 
     def obter_conta(self, numero_conta):
+        """Obtém uma conta pelo número da conta.
+
+        Args:
+            numero_conta (int): Número da conta.
+
+        Returns:
+            dict: conta correspondente ao número, se encontrada. Caso contrário, None.
+        """
         return next((conta for conta in self.contas if conta["numero_conta"] == numero_conta), None)
 
     def depositar(self):
+        """Realiza um depósito numa conta existente."""
         numero_conta = int(input("Digite o número da conta: "))
         conta = self.obter_conta(numero_conta)
         if not conta:
@@ -80,7 +114,7 @@ class Banco:
             return
 
         valor_deposito = int(input("Qual é o valor do depósito?: "))
-        if valor_deposito < 0:
+        if valor_deposito <= 0:
             print("Valor inválido\n")
         else:
             conta["saldo"] +=valor_deposito
@@ -88,16 +122,17 @@ class Banco:
             print("Depósito efetuado com sucesso\n")
 
     def sacar(self):
+        """Realiza o saque numa conta existente, respeitando o limite de 3 saques diários."""
         numero_conta = int(input("Digite o número da conta: "))
         conta = self.obter_conta(numero_conta)
         if not conta:
             print("Conta não encontrada\n")
             return
 
-        if self.saques_diarios["data"] != date.today():
-            self.saques_diarios = {"data": date.today(), "contador": 0}
+        if conta["saques_diarios"]["data"] != date.today():
+            conta["saques_diarios"] = {"data": date.today(), "contador": 0}
 
-        if self.saques_diarios["contador"] >= 3:
+        if conta["saques_diarios"]["contador"] >= 3:
             print("Limite de saques diários atingido\n")
             return
 
@@ -105,12 +140,17 @@ class Banco:
         if valor_saque <= conta["saldo"]:
             conta["saldo"] -= valor_saque
             conta["extrato"]["saques"].append(valor_saque)
-            self.saques_diarios["contador"] += 1
+            conta["saques_diarios"]["contador"] += 1
             print("Saque efetuado com sucesso\n")
-        else:
+        elif valor_saque > conta["saldo"]:
             print("Saldo insuficiente\n")
+        elif valor_saque == 0:
+            print("Valor inválido\n")
+        else:
+            print("Inválido\n")
 
     def exibir_extrato(self):
+        """Exibe o extrato de uma conta existente, incluindo dados do usuário e transações."""
         numero_conta = int(input("Digite o número da conta: "))
         conta = self.obter_conta(numero_conta)
         if not conta:
@@ -118,7 +158,12 @@ class Banco:
             return
 
         print("Extrato".center(25, "="))
-        print("Depósito".center(25, "="))
+        print("Dados Pessoais".center(25, "="))
+        print(f"Nome: {conta['usuario']['nome']}")
+        print(f"CPF: {conta['usuario']['cpf']}")
+        print(f"Agência: {conta['agencia']}")
+        print(f"Número da conta: {conta['numero_conta']}")
+        print("Depósitos".center(25, "="))
         for i, valor in enumerate(conta["extrato"]["depositos"]):
             print(f"{i + 1}. R$ {valor:.2f}")
         print("Saques".center(25, "="))
@@ -129,7 +174,8 @@ class Banco:
         print("\n")
 
     def main(self):
-
+        """Método principal que exibe o menu de opções e executa as funcionalidades escolhidas
+        pelo usuário."""
         while True:
 
             opcao = self.exibir_menu()
