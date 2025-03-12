@@ -105,15 +105,13 @@ class Banco:
         """
         return next((conta for conta in self.contas if conta["numero_conta"] == numero_conta), None)
 
-    def depositar(self):
+    def depositar(self, numero_conta, valor_deposito):
         """Realiza um depósito numa conta existente."""
-        numero_conta = int(input("Digite o número da conta: "))
         conta = self.obter_conta(numero_conta)
         if not conta:
             print("Conta não encontrada\n")
             return
 
-        valor_deposito = int(input("Qual é o valor do depósito?: "))
         if valor_deposito <= 0:
             print("Valor inválido\n")
         else:
@@ -121,9 +119,8 @@ class Banco:
             conta["extrato"]["depositos"].append(valor_deposito)
             print("Depósito efetuado com sucesso\n")
 
-    def sacar(self):
+    def sacar(self, *, numero_conta, valor_saque):
         """Realiza o saque numa conta existente, respeitando o limite de 3 saques diários."""
-        numero_conta = int(input("Digite o número da conta: "))
         conta = self.obter_conta(numero_conta)
         if not conta:
             print("Conta não encontrada\n")
@@ -136,7 +133,6 @@ class Banco:
             print("Limite de saques diários atingido\n")
             return
 
-        valor_saque = int(input("Qual é o valor do saque?: "))
         if valor_saque <= conta["saldo"]:
             conta["saldo"] -= valor_saque
             conta["extrato"]["saques"].append(valor_saque)
@@ -149,9 +145,8 @@ class Banco:
         else:
             print("Inválido\n")
 
-    def exibir_extrato(self):
+    def exibir_extrato(self, numero_conta):
         """Exibe o extrato de uma conta existente, incluindo dados do usuário e transações."""
-        numero_conta = int(input("Digite o número da conta: "))
         conta = self.obter_conta(numero_conta)
         if not conta:
             print("Conta não encontrada\n")
@@ -180,11 +175,16 @@ class Banco:
 
             opcao = self.exibir_menu()
             if opcao == "1":
-                self.depositar()
+                numero_conta = int(input("Digite o número da conta: "))
+                valor_deposito = float(input("Digite o valor do depósito: "))
+                self.depositar(numero_conta, valor_deposito)
             elif opcao == "2":
-                self.sacar()
+                numero_conta = int(input("Digite o número da conta: "))
+                valor_saque = float(input("Digite o valor do saque: "))
+                self.sacar(numero_conta=numero_conta, valor_saque=valor_saque)
             elif opcao == "3":
-                self.exibir_extrato()
+                numero_conta = int(input("Digite o número da conta: "))
+                self.exibir_extrato(numero_conta=numero_conta)
             elif opcao == "4":
                 self.criar_usuario()
             elif opcao == "5":
